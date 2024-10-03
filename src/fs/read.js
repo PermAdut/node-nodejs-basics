@@ -9,7 +9,7 @@ const read = async () => {
     try{
         await fsPromises.access(path, constants.F_OK);
         const content = await fsPromises.readFile(path);
-        console.log(content.toString())
+        process.stdout.write(content.toString() + '\n');
     } catch(err){
         throw new Error("FS operation failed");
     }

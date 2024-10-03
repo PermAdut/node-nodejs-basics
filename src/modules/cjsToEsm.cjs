@@ -1,6 +1,9 @@
-const path = require('path');
-const { release, version } = require('os');
-const { createServer: createServerHttp } = require('http');
+import path from 'path';
+import { release, version } from 'os';
+import { createServer} from 'http';
+//const path = require('path');
+//const { release, version } = require('os');
+//const { createServer: createServerHttp } = require('http');
 require('./files/c');
 
 const random = Math.random();

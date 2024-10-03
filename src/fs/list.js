@@ -9,7 +9,7 @@ const list = async () => {
     await fsPromises.opendir(path);
     const dir = await fsPromises.opendir(path);
     for await (const dirent of dir) {
-      console.log(dirent.name);
+      process.stdout.write(dirent.name + '\n');
     }
   } catch (err) {
     throw new Error("FS operation failed"); 
