@@ -8,8 +8,13 @@ const read = async () => {
   const __filepath = fileURLToPath(import.meta.url);
   const pathToFile = dirname(__filepath) + "\\files\\fileToRead.txt";
   const readStream = createReadStream(pathToFile);
-  readStream.on("data", (data) => {
-    process.stdout.write(data.toString() + "\n");
+  readStream.on("readable", () => {
+    let data;
+    if ((data = readStream.read()) != null) {
+      process.stdout.write(data + "\n");
+    } else {
+      process.stdout.emit("close");
+    }
   });
 };
 
