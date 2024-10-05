@@ -8,8 +8,8 @@ const copy = async () => {
   //implement function that copies folder files files with all its content into folder files_copy at the same level
   //(if files folder doesn't exists or files_copy has already been created Error with message FS operation failed must be thrown)
   const __filename = fileURLToPath(import.meta.url);
-  const copyPath = path.resolve(dirname(__filename), 'files');
-  const filePath = path.resolve(dirname(__filename), 'files_copy');
+  const copyPath = path.resolve(dirname(__filename), "files");
+  const filePath = path.resolve(dirname(__filename), "files_copy");
   try {
     await fsPromises.opendir(filePath);
     throw new Error("FS operation failed");
@@ -18,15 +18,25 @@ const copy = async () => {
       const dir = await fsPromises.opendir(copyPath);
       await fsPromises.mkdir(filePath);
       for await (const dirent of dir) {
-        await fsPromises.copyFile(
-          path.resolve(copyPath, dirent.name),
-          path.resolve(filePath, dirent.name)
+        const fileStat = await fsPromises.stat(
+          path.resolve(copyPath, dirent.name)
         );
+        if (fileStat.isFile()) {
+          await fsPromises.copyFile(
+            path.resolve(copyPath, dirent.name),
+            path.resolve(filePath, dirent.name)
+          );
+        } else {
+          await fsPromises.cp(
+            path.resolve(copyPath, dirent.name),
+            path.resolve(filePath, dirent.name),
+            { recursive: true }
+          );
+        }
       }
     } else {
-        throw err;
+      throw err;
     }
-    
   }
 };
 
