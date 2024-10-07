@@ -1,4 +1,4 @@
-import worker from "node:worker_threads"
+import worker, { isMainThread } from "node:worker_threads"
 import os from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url";
@@ -12,13 +12,15 @@ const performCalculations = async () => {
     const result = [];
     const fileName = fileURLToPath(import.meta.url);
     const workerJs = path.resolve(path.dirname(fileName), 'worker.js');
+    let completedThreads = 0;
     for(let i = 0; i<cores; i++){
         const thread = new worker.Worker(workerJs, {argv:[i + 10]}); 
         thread.on('message', (data) => {
             result.push(data)
         })
         thread.on('exit', () => {
-            if(result.length === cores)
+            completedThreads++;
+            if(completedThreads === cores)
                 console.log(result);
         })
     }
