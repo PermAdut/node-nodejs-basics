@@ -12,18 +12,18 @@ const performCalculations = async () => {
     const result = [];
     const fileName = fileURLToPath(import.meta.url);
     const workerJs = path.resolve(path.dirname(fileName), 'worker.js');
-    let completedThreads = 0;
-    for(let i = 0; i<cores; i++){
-        const thread = new worker.Worker(workerJs, {argv:[i + 10]}); 
-        thread.on('message', (data) => {
-            result.push(data)
-        })
-        thread.on('exit', () => {
-            completedThreads++;
-            if(completedThreads === cores)
-                console.log(result);
-        })
-    }
+    await Promise.all(Array.from({length: cores}).map((_, i) => {
+        return new Promise((resolve) => {
+            const thread = new worker.Worker(workerJs, {argv:[i + 10]}); 
+            thread.on('message', (data) => {
+                result.push(data);
+            })
+            thread.on('exit', () => {
+                resolve();
+            })
+        });
+    }));
+    console.log(result.sort((a, b) => a.data - b.data));
 };
 
 await performCalculations();
